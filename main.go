@@ -18,6 +18,7 @@ func AutoMigrate(db *gorm.DB) {
 
     // Tambahkan kaskade ke post_tags
     // db.Exec("ALTER TABLE post_tags ADD CONSTRAINT fk_post_tags_tags FOREIGN KEY (tag_id) REFERENCES tags(id) ON DELETE CASCADE;")
+	// here is an update
 }
 
 
