@@ -9,9 +9,12 @@ import (
 
 type PostService interface {
 	CreatePostWithTags(post *model.Post, tagNames []string) error
+	DeleteTagFromPost(tagID uint, postID uint) error
 	UpdatePostByIDWithTags(id uint, updatedPost *model.Post) error
-	GetPostByID(id uint) (*model.Post, error)
-	GetPosts() ([]model.Post, error)
+	GetPostByID(id uint) (model.Post, error)
+	GetPosts(perPage int, page int) ([]model.Post, int64, error)
+	GetPostByTagID(tagID uint) ([]model.Post, error)
+	AppendTagToPost(postID uint, tagNames []string) error 
 }
 
 type postService struct {
@@ -22,12 +25,64 @@ func NewPostService(postRepo repository.PostRepository) PostService {
 	return &postService{postRepo: postRepo}
 }
 
-func (s *postService) CreatePostWithTags(post *model.Post, tagNames []string) error {
+func (s *postService) AppendTagToPost(postID uint, tagNames []string) error {
+	post, err := s.postRepo.GetPostByID(postID)
+	if err != nil {
+		return err
+	}
+	
 	for _, tagName := range tagNames {
 		tag := model.Tag{Name: tagName}
-		post.Tags = append(post.Tags, tag)
+		s.postRepo.AppendTagToPost(post, tag)
+		// post.Tags = append(post.Tags, tag)
 	}
-	return s.postRepo.CreatePost(post)
+	return nil
+}
+
+func (s *postService) GetPostByTagID(tagID uint) ([]model.Post, error) {
+	tag, err := s.postRepo.GetPostByTagID2(tagID)
+	if err != nil {
+		return nil, err
+	}
+
+	posts, err := s.postRepo.GetPostAssociationByTag(tag)
+	if err != nil {
+		return posts, err
+	}
+	
+	return posts, nil
+}
+
+func (s *postService) DeleteTagFromPost(tagID uint, postID uint) error {
+	tag, err := s.postRepo.GetTagByID(tagID)
+	if err != nil {
+		return err
+	}
+
+	post, err := s.postRepo.GetPostByID(postID)
+	if err != nil {
+		return err
+	}
+
+	err = s.postRepo.DeleteTagFromPost(post, tag)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (s *postService) CreatePostWithTags(post *model.Post, tagNames []string) error {
+	err := s.postRepo.CreatePost(post)
+	if err != nil {
+		return err
+	}
+	for _, tagName := range tagNames {
+		tag := model.Tag{Name: tagName}
+		s.postRepo.AppendTagToPost(*post, tag)
+		// post.Tags = append(post.Tags, tag)
+	}
+	return nil
 }
 
 func (s *postService) UpdatePostByIDWithTags(id uint, updatedPost *model.Post) error {
@@ -58,39 +113,21 @@ func (s *postService) UpdatePostByIDWithTags(id uint, updatedPost *model.Post) e
 	return s.postRepo.UpdatePost(existingPost)
 }
 
-func (s *postService) GetPostByID(id uint) (*model.Post, error) {
-	return s.postRepo.FindPostByID(id)
+func (s *postService) GetPostByID(id uint) (model.Post, error) {
+	return s.postRepo.GetPostByID(id)
 }
 
-func (s *postService) GetPosts() ([]model.Post, error) {
-	posts, err := s.postRepo.FindPosts()
+func (s *postService) GetPosts(perPage int, page int) ([]model.Post, int64, error){
+	
+	posts, err := s.postRepo.FindPosts(perPage, page)
 	if err != nil {
-		return posts, err
+		return posts, 0, err
 	}
 
-	return posts, nil
+	totalData, err := s.postRepo.CountAllPost()
+	if err != nil {
+		return posts, totalData, err
+	}
+
+	return posts, totalData, nil
 }
-
-// func (s *PostService) CreatePostWithTags(post *model.Post, tagNames []string) error {
-//     if err := s.PostRepo.CreatePost(post); err != nil {
-//         return err
-//     }
-
-//     for _, tagName := range tagNames {
-//         tag := model.Tag{Name: tagName}
-//         if err := s.PostRepo.CreateTag(&tag); err != nil {
-//             return err
-//         }
-//         post.Tags = append(post.Tags, tag)
-//     }
-// 	// return nil
-
-// 	if err := s.PostRepo.DB.Save(post).Error; err != nil {
-// 		return err
-// 	}
-// 	return nil
-// }
-
-// func (s *PostService) UpdatePostWithTags(post *model.Post, tagNames []string) error {
-//     return s.PostRepo.UpdatePostTags(post, tagNames)
-// }
