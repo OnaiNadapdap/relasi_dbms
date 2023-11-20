@@ -50,8 +50,14 @@ func main() {
 	v1 := router.Group("/api/v1")
 	{
 		v1.POST("/posts", postHandler.CreatePostWithTags)
-		v1.PUT("/posts/:id", postHandler.UpdatePostWithTags)
+		v1.DELETE("/posts/:postID/tags/:tagID", postHandler.DeleteTagFromPost)
+		v1.GET("/posts/tags/:tagID", postHandler.GetPostByTagID)
+		v1.POST("/posts/:postID", postHandler.AppendTagToPost)
+
+
+		// v1.PUT("/posts/:id", postHandler.UpdatePostWithTags)
         v1.GET("/posts", postHandler.GetAllPosts)
+
 	}
 
 	// Establish many-to-many relationship
