@@ -65,6 +65,7 @@ func main() {
 	log.Println("starting point yeah")
 	log.Println("again")
 	log.Println("starting line up")
+	log.Println("try git revert")
 	router.Run(":8080")
 
 }
