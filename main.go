@@ -1,6 +1,8 @@
 package main
 
 import (
+	"log"
+
 	"github.com/gin-gonic/gin"
 	"github.com/onainadapdap1/kampus_tutor/coba_many_to_many/handler"
 	"github.com/onainadapdap1/kampus_tutor/coba_many_to_many/model"
@@ -60,46 +62,7 @@ func main() {
 
 	}
 
-	// Establish many-to-many relationship
-
+	log.Println("starting point yeah")
 	router.Run(":8080")
 
 }
-
-// func CreatePost(c *gin.Context) {
-//     // Ambil data post dari request body
-//     var post model.Post
-//     if err := c.ShouldBindJSON(&post); err != nil {
-//         c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-//         return
-//     }
-
-//     // Buat relasi post dengan tag
-//     var tagNames []string
-//     if len(post.TagNames) > 0 {
-// 		tagNames = append(tagNames, post.TagNames...)
-// 	}
-
-//     // Simpan post dan relasi post dengan tag
-
-//     // Buat slice untuk menyimpan tags
-//     var tags []model.Tag
-
-//     // Looping tag names
-//     for _, tagName := range tags {
-//         // Simpan tag ke databasef
-//         db.Create(&tagName)
-
-//         // Append tag ke slice tags
-//         tags = append(tags, tagName)
-//     }
-
-//     // Simpan post dan relasi post dengan tag
-//     db.Create(&post)
-//     for _, tag := range tags {
-//         db.Model(&post).Association("Tags").Append(&tag)
-//     }
-
-//     // Kirim respon
-//     c.JSON(http.StatusOK, gin.H{"data": post})
-// }

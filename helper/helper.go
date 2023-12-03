@@ -18,16 +18,16 @@ type Response struct {
 }
 
 func APIResponse(message string, code int, status string, data interface{}, perPage int, page int, totalData int64, totalPage int) Response {
-	meta := Meta{
+	meta := Meta {
 		Message: message,
-		Code:    code,
-		Status:  status,
+		Code: code,
+		Status: status,
 	}
-	jsonResponse := Response{
-		Meta:      meta,
-		Data:      data,
-		PerPage:   perPage,
-		Page:      page,
+	jsonResponse := Response {
+		Meta: meta,
+		Data: data,
+		PerPage: perPage,
+		Page: page,
 		TotalData: totalData,
 		TotalPage: totalPage,
 	}
@@ -39,4 +39,6 @@ func PaginationScopes(page int, perPage int) func(db *gorm.DB) *gorm.DB {
 		offset := (page - 1) * perPage
 		return db.Offset(offset).Limit(perPage)
 	}
+
 }
+
