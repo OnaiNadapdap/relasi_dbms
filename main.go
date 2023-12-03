@@ -63,6 +63,8 @@ func main() {
 	}
 
 	log.Println("starting point yeah")
+	log.Println("again")
+	log.Println("starting line up")
 	router.Run(":8080")
 
 }
